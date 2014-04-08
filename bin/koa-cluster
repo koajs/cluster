@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+
+var program = require('commander')
+var cluster = require('cluster')
+
+program
+  .usage('<app>')
+  .option('-t, --title <str>', 'title of the process')
+  .option('-c, --cpu <int>', 'number of processes to use', parseInt)
+  .parse(process.argv)
+
+// make sure the file exists
+var filename = require('path').resolve(program.args[0])
+var requirename = require.resolve(filename)
+try {
+  require('fs').statSync(requirename)
+} catch (err) {
+  console.error('resolved %s to %s then %s', program.args[0], filename, requirename)
+  console.error('however, %s does not exist', requirename)
+  process.exit(1)
+}
+
+if (program.title) process.title = program.title
+
+cluster.setupMaster({
+  exec: require.resolve('../lib/http.js'),
+  execArgv: ['--harmony-generators'],
+  args: [requirename],
+})
+
+var cpus = require('os').cpus().length
+var procs = Math.ceil(0.75 * cpus)
+for (var i = 0; i < procs; i++) cluster.fork()
+
+// http://nodejs.org/api/cluster.html#cluster_event_disconnect
+// not sure if i need to listen to the `exit` event
+cluster.on('disconnect', onDisconnect)
+
+// don't try to terminate multiple times
+var terminating = false
+process.on('SIGTERM', terminate)
+process.on('SIGINT', terminate)
+
+// i'm not even sure if we need to pass SIGTERM to the workers...
+function terminate() {
+  if (terminating) return
+  terminating = true
+
+  // don't restart workers
+  cluster.removeListener('disconnect', onDisconnect)
+  // kill all workers
+  Object.keys(cluster.workers).forEach(function (id) {
+    console.log('sending kill signal to worker %s', id)
+    cluster.workers[id].kill('SIGTERM')
+  })
+}
+
+function onDisconnect(worker) {
+  console.log('worker ' + worker.process.pid + ' has died. forking.')
+  cluster.fork()
+}
