@@ -1,7 +1,7 @@
 {
   "name": "koa-cluster",
   "description": "Koa clustering and domain-based error handling utility",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "Jonathan Ong",
     "email": "me@jongleberry.com",
