@@ -24,7 +24,7 @@ if (program.title) process.title = program.title
 
 cluster.setupMaster({
   exec: require.resolve('../lib/http.js'),
-  execArgv: ['--harmony-generators'],
+  execArgv: ['--harmony'],
   args: [requirename],
 })
 
