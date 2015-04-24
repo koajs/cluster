@@ -1,7 +1,7 @@
 
 # Koa Cluster
 
-Lightweight, opinionated clustering and domain-based error handling for Koa apps.
+Lightweight, opinionated clustering for Koa apps.
 Use this if you don't want the complexity of other process managers.
 
 ## Usage
