@@ -42,6 +42,7 @@ These settings are:
 
 - `name` - your app's name
 - `port`
+- `hostname`
 - `maxHeadersCount`
 - `timeout`
 
