@@ -6,7 +6,7 @@ var cluster = require('cluster')
 program
   .usage('<app>')
   .option('-t, --title <str>', 'title of the process')
-  .option('-c, --cpu <int>', 'number of processes to use', parseInt)
+  .option('-p, --processes <int>', 'number of processes to use', parseInt)
   .parse(process.argv)
 
 // make sure the file exists
@@ -28,8 +28,15 @@ cluster.setupMaster({
   args: [requirename],
 })
 
-var cpus = require('os').cpus().length
-var procs = Math.ceil(0.75 * cpus)
+var procs;
+
+if(program.processes) {
+  procs = program.processes;
+} else {
+  var cpus = require('os').cpus().length
+  procs = Math.ceil(0.75 * cpus)
+}
+
 for (var i = 0; i < procs; i++) cluster.fork()
 
 // http://nodejs.org/api/cluster.html#cluster_event_disconnect
