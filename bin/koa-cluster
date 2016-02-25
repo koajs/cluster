@@ -30,7 +30,7 @@ cluster.setupMaster({
 
 var procs;
 
-if(program.processes) {
+if (program.processes) {
   procs = program.processes;
 } else {
   var cpus = require('os').cpus().length
