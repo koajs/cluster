@@ -7,6 +7,8 @@ program
   .usage('<app>')
   .option('-t, --title <str>', 'title of the process')
   .option('-p, --processes <int>', 'number of processes to use', parseInt)
+  .option('-s, --startsecs <int>', 'number of seconds which children needs to'
+    + ' stay running to be considered a successfull start [1]', parseInt, 1)
   .parse(process.argv)
 
 // make sure the file exists
@@ -39,6 +41,10 @@ if (program.processes) {
 
 for (var i = 0; i < procs; i++) cluster.fork()
 
+// remember the time which children have started in order
+// to stop everything on instant failure
+var startTime = process.hrtime()
+
 // http://nodejs.org/api/cluster.html#cluster_event_disconnect
 // not sure if i need to listen to the `exit` event
 cluster.on('disconnect', onDisconnect)
@@ -63,6 +69,15 @@ function terminate() {
 }
 
 function onDisconnect(worker) {
-  console.log('worker ' + worker.process.pid + ' has died. forking.')
-  cluster.fork()
+  var timeSinceStart = process.hrtime(startTime)
+  timeSinceStart = timeSinceStart[0] + timeSinceStart[1] / 1e9
+  if (timeSinceStart < program.startsecs) {
+    console.log('worker ' + worker.process.pid + ' has died'
+      + ' before startsecs is over. stopping all.')
+    process.exitCode = worker.process.exitCode || 1
+    terminate()
+  } else {
+    console.log('worker ' + worker.process.pid + ' has died. forking.')
+    cluster.fork()
+  }
 }
