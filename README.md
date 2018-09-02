@@ -1,6 +1,8 @@
 
 # Koa Cluster
 
+<a href="https://communityinviter.com/apps/koa-js/koajs" rel="KoaJs Slack Community">![KoaJs Slack](https://img.shields.io/badge/Koa.Js-Slack%20Channel-Slack.svg?longCache=true&style=for-the-badge)</a>
+
 Lightweight, opinionated clustering for Koa apps.
 Use this if you don't want the complexity of other process managers.
 
