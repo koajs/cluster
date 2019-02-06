@@ -47,6 +47,7 @@ These settings are:
 - `hostname`
 - `maxHeadersCount`
 - `timeout`
+- `workerTimeout`
 
 ## License
 
