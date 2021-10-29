@@ -9,6 +9,7 @@ program
   .option('-p, --processes <int>', 'number of processes to use', parseInt)
   .option('-s, --startsecs <int>', 'number of seconds which children needs to'
     + ' stay running to be considered a successfull start [1]', parseInt, 1)
+  .option('-a, --node-args <str>', 'node args for child processes', '--harmony')
   .parse(process.argv)
 
 // make sure the file exists
@@ -24,9 +25,10 @@ try {
 
 if (program.title) process.title = program.title
 
+const execArgv = program.nodeArgs.split(' ').filter(Boolean);
 cluster.setupMaster({
   exec: require.resolve('../lib/http.js'),
-  execArgv: ['--harmony'],
+  execArgv,
   args: [requirename],
 })
 
